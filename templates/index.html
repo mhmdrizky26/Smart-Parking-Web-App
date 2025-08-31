@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Parking Slot Detection</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: #111; 
+      color: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #000;
+      color: #fff;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 10px rgba(255,255,255,0.1);
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex: 1;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .video-container {
+      background: #1a1a1a;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(255,255,255,0.1);
+    }
+
+    .video-container img {
+      border-radius: 8px;
+      width: 100%;
+      height: auto;
+    }
+
+    .status-container {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 12px rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 20px;
+    }
+
+    .status-container h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #fff;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+      width: 100%;
+      text-align: center;
+    }
+
+    #status {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      width: 100%;
+    }
+
+    .slot {
+      padding: 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 8px rgba(255,255,255,0.1);
+    }
+
+    .slot:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(255,255,255,0.3);
+    }
+
+    .occupied {
+      background: linear-gradient(135deg, #333, #111);
+      color: #ff4d4d; 
+      border: 2px solid #ff4d4d;
+    }
+
+    .empty {
+      background: linear-gradient(135deg, #333, #111);
+      color: #4dff88; 
+      border: 2px solid #4dff88;
+    }
+  </style>
+  <script>
+    function initSlots() {
+      const container = document.getElementById("status");
+      container.innerHTML = "";
+      for (let i = 1; i <= 10; i++) {
+        const div = document.createElement("div");
+        div.className = "slot empty";
+        div.id = "slot-" + i;
+        div.textContent = `Slot ${i}: EMPTY`;
+        container.appendChild(div);
+      }
+    }
+
+    async function fetchStatus() {
+      try {
+        const res = await fetch("/status");
+        const data = await res.json();
+        data.slots.forEach(s => {
+          const slotDiv = document.getElementById("slot-" + s.index);
+          if (slotDiv) {
+            slotDiv.className = "slot " + (s.occupied ? "occupied" : "empty");
+            slotDiv.textContent = `Slot ${s.index}: ${s.occupied ? "OCCUPIED" : "EMPTY"}`;
+          }
+        });
+      } catch (err) {
+        console.error("Failed to fetch slot status:", err);
+      }
+    }
+
+    window.onload = () => {
+      initSlots();
+      fetchStatus();
+      setInterval(fetchStatus, 2000);
+    };
+  </script>
+</head>
+<body>
+  <header>
+    Smart Parking Slot Detection
+  </header>
+  <div class="container">
+    <div class="video-container">
+      <img src="/video_feed" alt="Live Camera Feed">
+    </div>
+    <div class="status-container">
+      <h2>Parking Slot Status</h2>
+      <div id="status"></div>
+    </div>
+  </div>
+</body>
+</html>
