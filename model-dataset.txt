@@ -1,0 +1,3 @@
+Kami menggunakan roboflow untuk memproses model
+Link Roboflow : https://app.roboflow.com/n-urj74
+Link Dataset GDrive : https://drive.google.com/drive/folders/1Wo03C_JSDHBbNLbpR4ADoTyZtbKmhUP_?usp=drive_link
